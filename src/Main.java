@@ -16,6 +16,19 @@ public class Main {
     private static String porta;
     private static int parametro;
 
+    private static int lerNumero(Scanner scanner) {
+        while (!scanner.hasNextInt()) {
+            System.out.println("Digite apenas números!");
+            scanner.nextLine();
+            System.out.print("Tente novamente: ");
+        }
+
+        int numero = scanner.nextInt();
+        scanner.nextLine();
+
+        return numero;
+    }
+
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
@@ -120,9 +133,13 @@ public class Main {
     // --- MÉTODOS DAS AÇÕES DA IMPRESSORA ---
 
     private static void configurarConexao(Scanner scanner) {
+        if (conexaoAberta) {
+            System.out.println("Feche a conexão antes de alterar os parâmetros.");
+            return;
+        }
+
         System.out.print("Tipo de conexão: ");
-        tipo = scanner.nextInt();
-        scanner.nextLine();
+        tipo = lerNumero(scanner);
 
         System.out.print("Modelo da impressora: ");
         modelo = scanner.nextLine();
@@ -131,8 +148,13 @@ public class Main {
         porta = scanner.nextLine();
 
         System.out.print("Parâmetro: ");
-        parametro = scanner.nextInt();
-        scanner.nextLine();
+        parametro = lerNumero(scanner);
+
+        if (modelo.trim().isEmpty() || porta.trim().isEmpty()) {
+            conexaoConfigurada = false;
+            System.out.println("Modelo e porta não podem ficar vazios.");
+            return;
+        }
 
         conexaoConfigurada = true;
 
@@ -154,17 +176,21 @@ public class Main {
         String texto = scanner.nextLine();
 
         System.out.print("Posição: ");
-        int posicao = scanner.nextInt();
+        int posicao = lerNumero(scanner);
 
         System.out.print("Estilo: ");
-        int estilo = scanner.nextInt();
+        int estilo = lerNumero(scanner);
 
         System.out.print("Tamanho: ");
-        int tamanho = scanner.nextInt();
+        int tamanho = lerNumero(scanner);
 
         System.out.print("Quantas cópias? ");
-        int copias = scanner.nextInt();
-        scanner.nextLine();
+        int copias = lerNumero(scanner);
+
+        if (copias <= 0) {
+            System.out.println("A quantidade de cópias deve ser maior que zero.");
+            return;
+        }
 
         for (int i = 1; i <= copias; i++) {
             System.out.println("Impressão " + i + " de " + copias);
@@ -177,36 +203,52 @@ public class Main {
         System.out.print("Conteúdo do QR Code: ");
         String conteudo = scanner.nextLine();
 
+        if (conteudo.isEmpty()) {
+            System.out.println("O conteúdo do QR Code não pode ficar vazio.");
+            return;
+        }
+
         System.out.print("Tamanho: ");
-        int tamanho = scanner.nextInt();
+        int tamanho = lerNumero(scanner);
 
         System.out.print("Nível de correção: ");
-        int nivelCorrecao = scanner.nextInt();
-        scanner.nextLine();
+        int nivelCorrecao = lerNumero(scanner);
+
+        if (tamanho <= 0) {
+            System.out.println("O tamanho deve ser maior que zero.");
+            return;
+        }
 
         impressora.imprimirQRCode(conteudo, tamanho, nivelCorrecao);
     }
 
     private static void imprimirCodigoDeBarras(Scanner scanner) {
         System.out.print("Tipo: ");
-        int tipo = scanner.nextInt();
-
-        scanner.nextLine();
+        int tipoCodigo = lerNumero(scanner);
 
         System.out.print("Código de barras: ");
         String codigo = scanner.nextLine();
 
+        if (codigo.isEmpty()) {
+            System.out.println("O código de barras não pode ficar vazio.");
+            return;
+        }
+
         System.out.print("Altura: ");
-        int altura = scanner.nextInt();
+        int altura = lerNumero(scanner);
 
         System.out.print("Largura: ");
-        int largura = scanner.nextInt();
+        int largura = lerNumero(scanner);
 
         System.out.print("HRI: ");
-        int hri = scanner.nextInt();
-        scanner.nextLine();
+        int hri = lerNumero(scanner);
 
-        impressora.imprimirCodigoBarras(tipo, codigo, altura, largura, hri);
+        if (altura <= 0 || largura <= 0) {
+            System.out.println("A altura e a largura devem ser maiores que zero.");
+            return;
+        }
+
+        impressora.imprimirCodigoBarras(tipoCodigo, codigo, altura, largura, hri);
     }
 
     private static void imprimirXmlSAT() {
@@ -227,6 +269,11 @@ public class Main {
             System.out.print("Digite a assinatura do QR Code da venda: ");
             String assinatura = scanner.nextLine();
 
+            if (assinatura.trim().isEmpty()) {
+                System.out.println("A assinatura não pode ficar vazia.");
+                return;
+            }
+
             impressora.imprimirXMLCancelamentoSAT(xml, assinatura, 0);
 
         } catch (IOException e) {
@@ -242,36 +289,53 @@ public class Main {
 
     private static void abrirGaveta(Scanner scanner) {
         System.out.print("Pino (0 ou 1): ");
-        int pino = scanner.nextInt();
+        int pino = lerNumero(scanner);
+
+        if (pino != 0 && pino != 1) {
+            System.out.println("O pino deve ser 0 ou 1.");
+            return;
+        }
 
         System.out.print("Tempo inicial (1 a 255): ");
-        int ti = scanner.nextInt();
+        int ti = lerNumero(scanner);
 
         System.out.print("Tempo final (1 a 255): ");
-        int tf = scanner.nextInt();
-        scanner.nextLine();
+        int tf = lerNumero(scanner);
+
+        if (ti < 1 || ti > 255 || tf < 1 || tf > 255) {
+            System.out.println("Os tempos devem estar entre 1 e 255.");
+            return;
+        }
 
         impressora.abrirGaveta(pino, ti, tf);
     }
 
     private static void emitirSinalSonoro(Scanner scanner) {
         System.out.print("Quantidade: ");
-        int quantidade = scanner.nextInt();
+        int quantidade = lerNumero(scanner);
 
         System.out.print("Tempo inicial: ");
-        int tempoInicio = scanner.nextInt();
+        int tempoInicio = lerNumero(scanner);
 
         System.out.print("Tempo final: ");
-        int tempoFim = scanner.nextInt();
-        scanner.nextLine();
+        int tempoFim = lerNumero(scanner);
+
+        if (quantidade <= 0 || tempoInicio < 0 || tempoFim < 0) {
+            System.out.println("Informe valores válidos para o sinal sonoro.");
+            return;
+        }
 
         impressora.sinalSonoro(quantidade, tempoInicio, tempoFim);
     }
 
     private static void avancarPapel(Scanner scanner) {
         System.out.print("Quantidade de linhas para avançar: ");
-        int linhas = scanner.nextInt();
-        scanner.nextLine();
+        int linhas = lerNumero(scanner);
+
+        if (linhas <= 0) {
+            System.out.println("A quantidade de linhas deve ser maior que zero.");
+            return;
+        }
 
         impressora.avancarPapel(linhas);
     }
