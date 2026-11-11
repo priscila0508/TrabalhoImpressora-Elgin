@@ -55,7 +55,7 @@ public class Main {
             }
 
             // Validação de conexão aberta para funcionalidades de impressão/comando
-            if (opcao >= 3 && opcao <= 12 && !conexaoAberta) {
+            if (opcao >= 3 && opcao <= 13 && !conexaoAberta) {
                 System.out.println("Conexão fechada. Configure (opção 1) e abra a conexão (opção 2) antes.\n");
                 continue;
             }
@@ -96,6 +96,9 @@ public class Main {
                     avancarPapel(scanner);
                     break;
                 case 12:
+                    impressora.cortarPapel(0);
+                    break;
+                case 13:
                     verificarStatusImpressora();
                     break;
                 case 0:
@@ -113,7 +116,7 @@ public class Main {
     // --- MENU ---
 
     private static void exibirMenu() {
-        System.out.println("============== MENU IMPRESSORA ==============");
+        System.out.println("============ MENU IMPRESSORA ============");
         System.out.println(" 1 - Configurar conexão");
         System.out.println(" 2 - Abrir conexão");
         System.out.println(" 3 - Imprimir texto");
@@ -125,9 +128,10 @@ public class Main {
         System.out.println(" 9 - Abrir gaveta");
         System.out.println("10 - Sinal sonoro");
         System.out.println("11 - Avançar papel");
-        System.out.println("12 - Status da impressora");
+        System.out.println("12 - Cortar papel");
+        System.out.println("13 - Status da impressora");
         System.out.println(" 0 - Fechar conexão e sair");
-        System.out.println("=============================================");
+        System.out.println("=========================================");
     }
 
     // --- MÉTODOS DAS AÇÕES DA IMPRESSORA ---
@@ -141,6 +145,12 @@ public class Main {
         System.out.print("Tipo de conexão: ");
         tipo = lerNumero(scanner);
 
+        if (tipo < 1 || tipo > 5) {
+            System.out.println("Tipo de conexão inválido. Informe um valor de 1 a 5.");
+            conexaoConfigurada = false;
+            return;
+        }
+
         System.out.print("Modelo da impressora: ");
         modelo = scanner.nextLine();
 
@@ -149,6 +159,12 @@ public class Main {
 
         System.out.print("Parâmetro: ");
         parametro = lerNumero(scanner);
+
+        if (tipo == 1 && parametro != 0) {
+            System.out.println("Para conexão USB, o parâmetro deve ser 0.");
+            conexaoConfigurada = false;
+            return;
+        }
 
         if (modelo.trim().isEmpty() || porta.trim().isEmpty()) {
             conexaoConfigurada = false;
@@ -175,14 +191,35 @@ public class Main {
         System.out.print("Texto a ser impresso: ");
         String texto = scanner.nextLine();
 
-        System.out.print("Posição: ");
+        if (texto.trim().isEmpty()) {
+            System.out.println("O texto não pode ficar vazio.");
+            return;
+        }
+
+        System.out.print("Posição (0-esquerda, 1-centro, 2-direita): ");
         int posicao = lerNumero(scanner);
 
-        System.out.print("Estilo: ");
+        if (posicao < 0 || posicao > 2) {
+            System.out.println("A posição deve ser 0, 1 ou 2.");
+            return;
+        }
+
+        System.out.print("Estilo (0 a 15): ");
         int estilo = lerNumero(scanner);
+
+        if (estilo < 0 || estilo > 15) {
+            System.out.println("O estilo deve estar entre 0 e 15.");
+            return;
+        }
 
         System.out.print("Tamanho: ");
         int tamanho = lerNumero(scanner);
+
+        if (tamanho < 0 || tamanho > 119 ||
+                tamanho % 16 > 7) {
+            System.out.println("Tamanho inválido.");
+            return;
+        }
 
         System.out.print("Quantas cópias? ");
         int copias = lerNumero(scanner);
@@ -194,8 +231,7 @@ public class Main {
 
         for (int i = 1; i <= copias; i++) {
             System.out.println("Impressão " + i + " de " + copias);
-
-            impressora.imprimirTexto(texto, posicao, estilo, tamanho);
+            impressora.imprimirTexto(texto + "\n", posicao, estilo, tamanho);
         }
     }
 
@@ -203,19 +239,24 @@ public class Main {
         System.out.print("Conteúdo do QR Code: ");
         String conteudo = scanner.nextLine();
 
-        if (conteudo.isEmpty()) {
+        if (conteudo.trim().isEmpty()) {
             System.out.println("O conteúdo do QR Code não pode ficar vazio.");
             return;
         }
 
-        System.out.print("Tamanho: ");
+        System.out.print("Tamanho (1 a 6): ");
         int tamanho = lerNumero(scanner);
 
-        System.out.print("Nível de correção: ");
+        if (tamanho < 1 || tamanho > 6) {
+            System.out.println("O tamanho deve estar entre 1 e 6.");
+            return;
+        }
+
+        System.out.print("Nível de correção (1 a 4): ");
         int nivelCorrecao = lerNumero(scanner);
 
-        if (tamanho <= 0) {
-            System.out.println("O tamanho deve ser maior que zero.");
+        if (nivelCorrecao < 1 || nivelCorrecao > 4) {
+            System.out.println("O nível de correção deve estar entre 1 e 4.");
             return;
         }
 
@@ -223,28 +264,43 @@ public class Main {
     }
 
     private static void imprimirCodigoDeBarras(Scanner scanner) {
-        System.out.print("Tipo: ");
+        System.out.print("Tipo (0 a 8): ");
         int tipoCodigo = lerNumero(scanner);
+
+        if (tipoCodigo < 0 || tipoCodigo > 8) {
+            System.out.println("O tipo deve estar entre 0 e 8.");
+            return;
+        }
 
         System.out.print("Código de barras: ");
         String codigo = scanner.nextLine();
 
-        if (codigo.isEmpty()) {
+        if (codigo.trim().isEmpty()) {
             System.out.println("O código de barras não pode ficar vazio.");
             return;
         }
 
-        System.out.print("Altura: ");
+        System.out.print("Altura (1 a 255): ");
         int altura = lerNumero(scanner);
 
-        System.out.print("Largura: ");
+        if (altura < 1 || altura > 255) {
+            System.out.println("A altura deve estar entre 1 e 255.");
+            return;
+        }
+
+        System.out.print("Largura (1 a 6): ");
         int largura = lerNumero(scanner);
 
-        System.out.print("HRI: ");
+        if (largura < 1 || largura > 6) {
+            System.out.println("A largura deve estar entre 1 e 6.");
+            return;
+        }
+
+        System.out.print("HRI (1 a 4): ");
         int hri = lerNumero(scanner);
 
-        if (altura <= 0 || largura <= 0) {
-            System.out.println("A altura e a largura devem ser maiores que zero.");
+        if (hri < 1 || hri > 4) {
+            System.out.println("O HRI deve estar entre 1 e 4.");
             return;
         }
 
@@ -320,8 +376,11 @@ public class Main {
         System.out.print("Tempo final: ");
         int tempoFim = lerNumero(scanner);
 
-        if (quantidade <= 0 || tempoInicio < 0 || tempoFim < 0) {
-            System.out.println("Informe valores válidos para o sinal sonoro.");
+        if (quantidade < 1 || quantidade > 63 ||
+                tempoInicio < 1 || tempoInicio > 25 ||
+                tempoFim < 1 || tempoFim > 25) {
+
+            System.out.println("Quantidade deve estar entre 1 e 63, e os tempos entre 1 e 25.");
             return;
         }
 

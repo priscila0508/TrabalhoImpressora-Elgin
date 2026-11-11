@@ -4,11 +4,11 @@ public class Impressora {
     private boolean conectada = false;
 
     // 1. Abre a conexão com a impressora
+
     public boolean abrirConexao(int tipo, String modelo, String conexao, int parametro) {
         try {
             int resultado = ImpressoraDLL.INSTANCE.AbreConexaoImpressora(
-                tipo, modelo, conexao, parametro
-            );
+                    tipo, modelo, conexao, parametro);
 
             if (resultado == 0) {
                 conectada = true;
@@ -21,6 +21,10 @@ public class Impressora {
         } catch (Exception e) {
             conectada = false;
             System.out.println("Erro ao abrir conexão: " + e.getMessage());
+
+        } catch (LinkageError e) {
+            conectada = false;
+            System.out.println("Erro ao carregar a DLL da impressora: " + e.getMessage());
         }
 
         return conectada;
@@ -40,7 +44,10 @@ public class Impressora {
                 }
 
             } catch (Exception e) {
-                System.out.println("Erro: " + e.getMessage());
+                System.out.println("Erro ao fechar conexão: " + e.getMessage());
+
+            } catch (LinkageError e) {
+                System.out.println("Erro de ligação com a DLL: " + e.getMessage());
             }
         } else {
             System.out.println("A impressora não está conectada.");
@@ -52,8 +59,7 @@ public class Impressora {
         if (conectada) {
             try {
                 int resultado = ImpressoraDLL.INSTANCE.ImpressaoTexto(
-                    dados, posicao, estilo, tamanho
-                );
+                        dados, posicao, estilo, tamanho);
 
                 if (resultado < 0) {
                     System.out.println("Erro ao imprimir texto.");
@@ -94,8 +100,7 @@ public class Impressora {
         if (conectada) {
             try {
                 int resultado = ImpressoraDLL.INSTANCE.ImpressaoQRCode(
-                    dados, tamanho, nivelCorrecao
-                );
+                        dados, tamanho, nivelCorrecao);
 
                 if (resultado == 0) {
                     System.out.println("QR Code enviado para impressão!");
@@ -116,8 +121,7 @@ public class Impressora {
         if (conectada) {
             try {
                 int resultado = ImpressoraDLL.INSTANCE.ImpressaoCodigoBarras(
-                    tipo, dados, altura, largura, HRI
-                );
+                        tipo, dados, altura, largura, HRI);
 
                 if (resultado == 0) {
                     System.out.println("Código de barras enviado para impressão!");
@@ -158,7 +162,43 @@ public class Impressora {
         if (conectada) {
             try {
                 int resultado = ImpressoraDLL.INSTANCE.StatusImpressora(parametro);
-                System.out.println("Status retornado: " + resultado);
+
+                if (resultado < 0) {
+                    System.out.println("Erro ao consultar o status da impressora.");
+                    return;
+                }
+
+                if (parametro == 5) {
+                    System.out.println("===== STATUS DA IMPRESSORA =====");
+
+                    if ((resultado & 1) != 0) {
+                        System.out.println("Gaveta: aberta");
+                    } else {
+                        System.out.println("Gaveta: fechada");
+                    }
+
+                    if ((resultado & 2) != 0) {
+                        System.out.println("Tampa: aberta");
+                    } else {
+                        System.out.println("Tampa: fechada");
+                    }
+
+                    if ((resultado & 8) != 0) {
+                        System.out.println("Papel: ausente");
+                    } else if ((resultado & 4) != 0) {
+                        System.out.println("Papel: próximo do fim");
+                    } else {
+                        System.out.println("Papel: normal");
+                    }
+                    if ((resultado & 16) != 0) {
+                        System.out.println("Ejetor: com papel");
+                    } else {
+                        System.out.println("Ejetor: sem papel");
+                    }
+
+                } else {
+                    System.out.println("Status retornado: " + resultado);
+                }
 
             } catch (Exception e) {
                 System.out.println("Erro: " + e.getMessage());
@@ -173,8 +213,7 @@ public class Impressora {
         if (conectada) {
             try {
                 int resultado = ImpressoraDLL.INSTANCE.AbreGavetaElgin(
-                    pino, tempoInicio, tempoFim
-                );
+                        pino, tempoInicio, tempoFim);
 
                 if (resultado == 0) {
                     System.out.println("Gaveta aberta com sucesso!");
@@ -195,8 +234,7 @@ public class Impressora {
         if (conectada) {
             try {
                 int resultado = ImpressoraDLL.INSTANCE.AbreGaveta(
-                    pino, tempoInicio, tempoFim
-                );
+                        pino, tempoInicio, tempoFim);
 
                 if (resultado == 0) {
                     System.out.println("Gaveta aberta com sucesso!");
@@ -217,8 +255,7 @@ public class Impressora {
         if (conectada) {
             try {
                 int resultado = ImpressoraDLL.INSTANCE.SinalSonoro(
-                    quantidade, tempoInicio, tempoFim
-                );
+                        quantidade, tempoInicio, tempoFim);
 
                 if (resultado == 0) {
                     System.out.println("Sinal sonoro executado com sucesso!");
@@ -379,8 +416,7 @@ public class Impressora {
         if (conectada) {
             try {
                 int resultado = ImpressoraDLL.INSTANCE.ImprimeXMLCancelamentoSAT(
-                    dados, assQRCode, parametro
-                );
+                        dados, assQRCode, parametro);
 
                 if (resultado == 0) {
                     System.out.println("XML de cancelamento enviado para impressão!");
