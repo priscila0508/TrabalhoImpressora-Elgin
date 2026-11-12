@@ -55,15 +55,16 @@ public class Impressora {
     }
 
     // 3. Impressão de texto
-    public void imprimirTexto(String dados, int posicao, int estilo, int tamanho) {
+    public void imprimirTexto(String dados) {
         if (conectada) {
             try {
                 int resultado = ImpressoraDLL.INSTANCE.ImpressaoTexto(
-                        dados, posicao, estilo, tamanho);
+                        dados, 0, 0, 0);
 
                 if (resultado < 0) {
                     System.out.println("Erro ao imprimir texto.");
                 } else {
+                    ImpressoraDLL.INSTANCE.Corte(5);
                     System.out.println("Texto enviado para impressão!");
                 }
 
@@ -96,13 +97,14 @@ public class Impressora {
     }
 
     // 5. Impressão de QR Code
-    public void imprimirQRCode(String dados, int tamanho, int nivelCorrecao) {
+    public void imprimirQRCode(String dados) {
         if (conectada) {
             try {
                 int resultado = ImpressoraDLL.INSTANCE.ImpressaoQRCode(
-                        dados, tamanho, nivelCorrecao);
+                        dados, 3, 1);
 
                 if (resultado == 0) {
+                    ImpressoraDLL.INSTANCE.Corte(5);
                     System.out.println("QR Code enviado para impressão!");
                 } else {
                     System.out.println("Erro ao imprimir QR Code.");
@@ -124,6 +126,7 @@ public class Impressora {
                         tipo, dados, altura, largura, HRI);
 
                 if (resultado == 0) {
+                    ImpressoraDLL.INSTANCE.Corte(5);
                     System.out.println("Código de barras enviado para impressão!");
                 } else {
                     System.out.println("Erro ao imprimir código de barras.");
@@ -271,133 +274,14 @@ public class Impressora {
         }
     }
 
-    // 12. Ativa o modo página
-    public void modoPagina() {
-        if (conectada) {
-            try {
-                int resultado = ImpressoraDLL.INSTANCE.ModoPagina();
-
-                if (resultado == 0) {
-                    System.out.println("Modo página ativado!");
-                } else {
-                    System.out.println("Erro ao ativar modo página.");
-                }
-
-            } catch (Exception e) {
-                System.out.println("Erro: " + e.getMessage());
-            }
-        } else {
-            System.out.println("Conecte a impressora primeiro!");
-        }
-    }
-
-    // 13. Limpa o buffer do modo página
-    public void limparBufferModoPagina() {
-        if (conectada) {
-            try {
-                int resultado = ImpressoraDLL.INSTANCE.LimpaBufferModoPagina();
-
-                if (resultado == 0) {
-                    System.out.println("Buffer limpo com sucesso!");
-                } else {
-                    System.out.println("Erro ao limpar buffer.");
-                }
-
-            } catch (Exception e) {
-                System.out.println("Erro: " + e.getMessage());
-            }
-        } else {
-            System.out.println("Conecte a impressora primeiro!");
-        }
-    }
-
-    // 14. Imprime o conteúdo do modo página
-    public void imprimirModoPagina() {
-        if (conectada) {
-            try {
-                int resultado = ImpressoraDLL.INSTANCE.ImprimeModoPagina();
-
-                if (resultado == 0) {
-                    System.out.println("Conteúdo impresso com sucesso!");
-                } else {
-                    System.out.println("Erro ao imprimir conteúdo.");
-                }
-
-            } catch (Exception e) {
-                System.out.println("Erro: " + e.getMessage());
-            }
-        } else {
-            System.out.println("Conecte a impressora primeiro!");
-        }
-    }
-
-    // 15. Retorna ao modo padrão
-    public void modoPadrao() {
-        if (conectada) {
-            try {
-                int resultado = ImpressoraDLL.INSTANCE.ModoPadrao();
-
-                if (resultado == 0) {
-                    System.out.println("Modo padrão ativado!");
-                } else {
-                    System.out.println("Erro ao ativar modo padrão.");
-                }
-
-            } catch (Exception e) {
-                System.out.println("Erro: " + e.getMessage());
-            }
-        } else {
-            System.out.println("Conecte a impressora primeiro!");
-        }
-    }
-
-    // 16. Define a posição horizontal
-    public void posicaoHorizontal(int posicao) {
-        if (conectada) {
-            try {
-                int resultado = ImpressoraDLL.INSTANCE.PosicaoImpressaoHorizontal(posicao);
-
-                if (resultado == 0) {
-                    System.out.println("Posição horizontal definida!");
-                } else {
-                    System.out.println("Erro ao definir posição horizontal.");
-                }
-
-            } catch (Exception e) {
-                System.out.println("Erro: " + e.getMessage());
-            }
-        } else {
-            System.out.println("Conecte a impressora primeiro!");
-        }
-    }
-
-    // 17. Define a posição vertical
-    public void posicaoVertical(int posicao) {
-        if (conectada) {
-            try {
-                int resultado = ImpressoraDLL.INSTANCE.PosicaoImpressaoVertical(posicao);
-
-                if (resultado == 0) {
-                    System.out.println("Posição vertical definida!");
-                } else {
-                    System.out.println("Erro ao definir posição vertical.");
-                }
-
-            } catch (Exception e) {
-                System.out.println("Erro: " + e.getMessage());
-            }
-        } else {
-            System.out.println("Conecte a impressora primeiro!");
-        }
-    }
-
-    // 18. Imprime XML SAT
+    // 12. Imprime XML SAT
     public void imprimirXMLSAT(String dados, int parametro) {
         if (conectada) {
             try {
                 int resultado = ImpressoraDLL.INSTANCE.ImprimeXMLSAT(dados, parametro);
 
                 if (resultado == 0) {
+                    ImpressoraDLL.INSTANCE.Corte(5);
                     System.out.println("XML SAT enviado para impressão!");
                 } else {
                     System.out.println("Erro ao imprimir XML SAT.");
@@ -411,7 +295,7 @@ public class Impressora {
         }
     }
 
-    // 19. Imprime XML de cancelamento SAT
+    // 13. Imprime XML de cancelamento SAT
     public void imprimirXMLCancelamentoSAT(String dados, String assQRCode, int parametro) {
         if (conectada) {
             try {
@@ -419,6 +303,7 @@ public class Impressora {
                         dados, assQRCode, parametro);
 
                 if (resultado == 0) {
+                    ImpressoraDLL.INSTANCE.Corte(5);
                     System.out.println("XML de cancelamento enviado para impressão!");
                 } else {
                     System.out.println("Erro ao imprimir XML de cancelamento.");

@@ -81,7 +81,7 @@ public class Main {
                     imprimirXmlSAT();
                     break;
                 case 7:
-                    imprimirXmlCancelamentoSAT(scanner);
+                    imprimirXmlCancelamentoSAT();
                     break;
                 case 8:
                     abrirGavetaElgin();
@@ -145,7 +145,7 @@ public class Main {
         System.out.print("Tipo de conexão: ");
         tipo = lerNumero(scanner);
 
-        if (tipo < 1 || tipo > 5) {
+        if (tipo < 1 || tipo > 4) {
             System.out.println("Tipo de conexão inválido. Informe um valor de 1 a 5.");
             conexaoConfigurada = false;
             return;
@@ -196,31 +196,6 @@ public class Main {
             return;
         }
 
-        System.out.print("Posição (0-esquerda, 1-centro, 2-direita): ");
-        int posicao = lerNumero(scanner);
-
-        if (posicao < 0 || posicao > 2) {
-            System.out.println("A posição deve ser 0, 1 ou 2.");
-            return;
-        }
-
-        System.out.print("Estilo (0 a 15): ");
-        int estilo = lerNumero(scanner);
-
-        if (estilo < 0 || estilo > 15) {
-            System.out.println("O estilo deve estar entre 0 e 15.");
-            return;
-        }
-
-        System.out.print("Tamanho: ");
-        int tamanho = lerNumero(scanner);
-
-        if (tamanho < 0 || tamanho > 119 ||
-                tamanho % 16 > 7) {
-            System.out.println("Tamanho inválido.");
-            return;
-        }
-
         System.out.print("Quantas cópias? ");
         int copias = lerNumero(scanner);
 
@@ -231,7 +206,7 @@ public class Main {
 
         for (int i = 1; i <= copias; i++) {
             System.out.println("Impressão " + i + " de " + copias);
-            impressora.imprimirTexto(texto + "\n", posicao, estilo, tamanho);
+            impressora.imprimirTexto(texto + "\n");
         }
     }
 
@@ -244,67 +219,15 @@ public class Main {
             return;
         }
 
-        System.out.print("Tamanho (1 a 6): ");
-        int tamanho = lerNumero(scanner);
-
-        if (tamanho < 1 || tamanho > 6) {
-            System.out.println("O tamanho deve estar entre 1 e 6.");
-            return;
-        }
-
-        System.out.print("Nível de correção (1 a 4): ");
-        int nivelCorrecao = lerNumero(scanner);
-
-        if (nivelCorrecao < 1 || nivelCorrecao > 4) {
-            System.out.println("O nível de correção deve estar entre 1 e 4.");
-            return;
-        }
-
-        impressora.imprimirQRCode(conteudo, tamanho, nivelCorrecao);
+        impressora.imprimirQRCode(conteudo);
     }
 
     private static void imprimirCodigoDeBarras(Scanner scanner) {
-        System.out.print("Tipo (0 a 8): ");
-        int tipoCodigo = lerNumero(scanner);
+        String codigo = "7891234567895";
 
-        if (tipoCodigo < 0 || tipoCodigo > 8) {
-            System.out.println("O tipo deve estar entre 0 e 8.");
-            return;
-        }
+        System.out.println("Imprimindo código de barras...");
 
-        System.out.print("Código de barras: ");
-        String codigo = scanner.nextLine();
-
-        if (codigo.trim().isEmpty()) {
-            System.out.println("O código de barras não pode ficar vazio.");
-            return;
-        }
-
-        System.out.print("Altura (1 a 255): ");
-        int altura = lerNumero(scanner);
-
-        if (altura < 1 || altura > 255) {
-            System.out.println("A altura deve estar entre 1 e 255.");
-            return;
-        }
-
-        System.out.print("Largura (1 a 6): ");
-        int largura = lerNumero(scanner);
-
-        if (largura < 1 || largura > 6) {
-            System.out.println("A largura deve estar entre 1 e 6.");
-            return;
-        }
-
-        System.out.print("HRI (1 a 4): ");
-        int hri = lerNumero(scanner);
-
-        if (hri < 1 || hri > 4) {
-            System.out.println("O HRI deve estar entre 1 e 4.");
-            return;
-        }
-
-        impressora.imprimirCodigoBarras(tipoCodigo, codigo, altura, largura, hri);
+        impressora.imprimirCodigoBarras(2, codigo, 100, 3, 2);
     }
 
     private static void imprimirXmlSAT() {
@@ -318,24 +241,18 @@ public class Main {
         }
     }
 
-    private static void imprimirXmlCancelamentoSAT(Scanner scanner) {
-        try {
-            String xml = Files.readString(Path.of("CANC_SAT.xml"));
+private static void imprimirXmlCancelamentoSAT() {
+    try {
+        String xml = Files.readString(Path.of("CANC_SAT.xml"));
 
-            System.out.print("Digite a assinatura do QR Code da venda: ");
-            String assinatura = scanner.nextLine();
+       String assinaturaCB = "Q5DLkpdRijIRGY6YSSNsTWK1TztHL1vD0V1Jc4spo/CEUqICEb9SFy82ym8EhBRZjbh3btsZhF+sjHqEMR159i4agru9x6KsepK/q0E2e5xlU5cv3m1woYfgHyOkWDNcSdMsS6bBh2Bpq6s89yJ9Q6qh/J8YHi306ce9Tqb/drKvN2XdE5noRSS32TAWuaQEVd7u+TrvXlOQsE3fHR1D5f1saUwQLPSdIv01NF6Ny7jZwjCwv1uNDgGZONJdlTJ6p0ccqnZvuE70aHOI09elpjEO6Cd+orI7XHHrFCwhFhAcbalc+ZfO5b/+vkyAHS6CYVFCDtYR9Hi5qgdk31v23w==";
 
-            if (assinatura.trim().isEmpty()) {
-                System.out.println("A assinatura não pode ficar vazia.");
-                return;
-            }
+        impressora.imprimirXMLCancelamentoSAT(xml, assinaturaCB, 0);
 
-            impressora.imprimirXMLCancelamentoSAT(xml, assinatura, 0);
-
-        } catch (IOException e) {
-            System.out.println("Erro ao ler o arquivo XML de cancelamento.");
-        }
+    } catch (IOException e) {
+        System.out.println("Erro ao ler o arquivo XML de cancelamento.");
     }
+}
 
     private static void abrirGavetaElgin() {
         System.out.println("Abrindo gaveta Elgin...");
